@@ -1,6 +1,20 @@
+local wtk = {}
+local widget
+local gui_root
+local panel
+local label
+local icon
+local button
+local spinner
+local spinbtn
+local checkbox
+local rbgroup
+local radio
+local color_picker
+
 -- utils
 
-function draw_convex_frame(x0, y0, x1, y1, c)
+local function draw_convex_frame(x0, y0, x1, y1, c)
  rectfill(x0, y0, x1, y1, c)
  line(x0, y0, x0, y1-1, 7)
  line(x0, y0, x1-1, y0, 7)
@@ -8,7 +22,7 @@ function draw_convex_frame(x0, y0, x1, y1, c)
  line(x1, y0+1, x1, y1, 5)
 end
 
-function draw_concave_frame(x0, y0, x1, y1, c)
+local function draw_concave_frame(x0, y0, x1, y1, c)
  rectfill(x0, y0, x1, y1, c)
  line(x0, y0, x0, y1-1, 5)
  line(x0, y0, x1-1, y0, 5)
@@ -16,7 +30,7 @@ function draw_concave_frame(x0, y0, x1, y1, c)
  line(x1, y0+1, x1, y1, 7)
 end
 
-function make_label(val)
+local function make_label(val)
  local t=type(val)
  if t=="number" then
   return icon.new(val)
@@ -34,12 +48,12 @@ function make_label(val)
  end
 end
 
-function subwidget(t)
+local function subwidget(t)
  t.__index=t
  setmetatable(t, { __index=widget })
 end
 
-function dummy()
+local function dummy()
 end
 
 -- base widget
@@ -104,7 +118,7 @@ end
 
 function widget:get_under_mouse(x, y)
  if (not self.visible) return nil
- 
+
  x-=self.x
  y-=self.y
  if x>=0 and x<self.w and y>=0 and y<self.h then
@@ -148,7 +162,7 @@ function gui_root:update()
  local dx=x-self.lastx
  local dy=y-self.lasty
  local bt=band(stat(34), 1)==1
- 
+
  local wum=self:get_under_mouse(x, y)
  if wum!=self.widget_under_mouse then
   if self.widget_under_mouse then
@@ -159,12 +173,12 @@ function gui_root:update()
    wum:on_mouse_enter()
   end
  end
- 
+
  if dx!=0 or dy!=0 then
   local w=self.clicked_widget or self.widget_under_mouse
   if (w) w:on_mouse_move(dx, dy)
  end
- 
+
  if self.lastbt then
   if not bt and self.clicked_widget then
    self.clicked_widget:on_mouse_release()
@@ -176,11 +190,11 @@ function gui_root:update()
    self.clicked_widget:on_mouse_press()
   end
  end
- 
+
  self.lastx=x
  self.lasty=y
  self.lastbt=bt
- 
+
  for c in all(self.children) do
   c:update_all()
  end
@@ -465,7 +479,7 @@ end
 function spinbtn:on_mouse_press()
  self.clicked=true
  self.timer=0
- 
+
  local p=self.parent
  self.parent:adjust(self.sign)
 end
@@ -526,7 +540,7 @@ function rbgroup:select(val)
  if self.selected then
   self.selected.selected=false
  end
- 
+
  self.selected=nil
  for r in all(self.btns) do
   if r.value==val then
@@ -535,7 +549,7 @@ function rbgroup:select(val)
    break
   end
  end
- 
+
  if self.func then
   self.func(self.selected)
  end
@@ -584,17 +598,17 @@ end
 function color_picker:draw(x, y)
  pal()
  palt(0, false)
- 
+
  rect(x, y, x+17, y+17, 0)
  x+=1
  y+=1
- 
+
  for c=0, 15 do
   local cx=x+(c%4)*4
   local cy=y+band(c, 12)
   rectfill(cx, cy, cx+3, cy+3, c)
  end
- 
+
  if self.value then
   local cx=x+(self.value%4)*4
   local cy=y+band(self.value, 12)
@@ -617,3 +631,17 @@ function color_picker:on_mouse_press()
   if (self.func) self.func(self)
  end
 end
+
+-- export
+wtk.gui_root = gui_root
+wtk.panel = panel
+wtk.label = label
+wtk.icon = icon
+wtk.button = button
+wtk.spinner = spinner
+wtk.checkbox = checkbox
+wtk.rbgroup = rbgroup
+wtk.radio = radio
+wtk.color_picker = color_picker
+
+return wtk

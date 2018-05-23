@@ -127,8 +127,8 @@ function widget:get_under_mouse(x, y)
   return nil
  end
 
- x-=self.x
- y-=self.y
+ x=x-self.x
+ y=y-self.y
  if x>=0 and x<self.w and y>=0 and y<self.h then
   local ret=nil
   if self.wants_mouse then
@@ -176,7 +176,7 @@ function gui_root:update()
  local bt=band(stat(34), 1)==1
 
  local wum=self:get_under_mouse(x, y)
- if wum!=self.widget_under_mouse then
+ if wum~=self.widget_under_mouse then
   if self.widget_under_mouse then
    self.widget_under_mouse:on_mouse_exit()
   end
@@ -186,7 +186,7 @@ function gui_root:update()
   end
  end
 
- if dx!=0 or dy!=0 then
+ if dx~=0 or dy~=0 then
   local w=self.clicked_widget or self.widget_under_mouse
   if w then
    w:on_mouse_move(dx, dy)
@@ -293,8 +293,8 @@ end
 
 function panel:on_mouse_move(dx, dy)
  if self.drag then
-  self.x+=dx
-  self.y+=dy
+  self.x=self.x+dx
+  self.y=self.y+dy
  end
 end
 
@@ -477,7 +477,7 @@ end
 
 function spinbtn:update()
  if self.timer<200 then
-  self.timer+=1
+  self.timer=self.timer+1
  end
  if self.clicked and self.under_mouse then
   if self.timer>=200 then
@@ -622,8 +622,8 @@ function color_picker:draw(x, y)
  palt(0, false)
 
  rect(x, y, x+17, y+17, 0)
- x+=1
- y+=1
+ x=x+1
+ y=y+1
 
  for c=0, 15 do
   local cx=x+(c%4)*4

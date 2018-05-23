@@ -96,7 +96,9 @@ function widget:update_all()
 end
 
 function widget:add_child(c, x, y)
- if (c.parent) c.parent:remove_child(c)
+ if c.parent then
+  c.parent:remove_child(c)
+ end
  c.x=x
  c.y=y
  c.parent=self
@@ -109,24 +111,34 @@ function widget:remove_child(c)
 end
 
 function widget:find(n)
- if (self.name==n) return self
+ if self.name==n then
+  return self
+ end
  for c in all(self.children) do
   local w=c:find(n)
-  if (w) return w
+  if w then
+   return w
+  end
  end
 end
 
 function widget:get_under_mouse(x, y)
- if (not self.visible) return nil
+ if not self.visible then
+  return nil
+ end
 
  x-=self.x
  y-=self.y
  if x>=0 and x<self.w and y>=0 and y<self.h then
   local ret=nil
-  if (self.wants_mouse) ret=self
+  if self.wants_mouse then
+   ret=self
+  end
   for c in all(self.children) do
    local mc=c:get_under_mouse(x, y)
-   if (mc) ret=mc
+   if mc then
+    ret=mc
+   end
   end
   return ret
  end
@@ -176,7 +188,9 @@ function gui_root:update()
 
  if dx!=0 or dy!=0 then
   local w=self.clicked_widget or self.widget_under_mouse
-  if (w) w:on_mouse_move(dx, dy)
+  if w then
+   w:on_mouse_move(dx, dy)
+  end
  end
 
  if self.lastbt then
@@ -241,13 +255,17 @@ function panel.new(w, h, c, d, s)
  p.h=h or 5
  p.c=c or 6
  p.style=s or 1
- if (d) p.draggable=true
+ if d then
+  p.draggable=true
+ end
  return p
 end
 
 function panel:add_child(c, x, y)
  local ex=2
- if (self.style==3) ex=1
+ if self.style==3 then
+  ex=1
+ end
  self.w=max(self.w, x+c.w+ex)
  self.h=max(self.h, y+c.h+ex)
  widget.add_child(self, c, x, y)
@@ -264,7 +282,9 @@ function panel:draw(x, y)
 end
 
 function panel:on_mouse_press()
- if (self.draggable) self.drag=true
+ if self.draggable then
+  self.drag=true
+ end
 end
 
 function panel:on_mouse_release()
@@ -456,7 +476,9 @@ function spinbtn:draw(x, y)
 end
 
 function spinbtn:update()
- if (self.timer<200) self.timer+=1
+ if self.timer<200 then
+  self.timer+=1
+ end
  if self.clicked and self.under_mouse then
   if self.timer>=200 then
    self.parent:adjust(self.sign*500)
@@ -628,7 +650,9 @@ function color_picker:on_mouse_press()
  local cy=flr(my/4)
  if cx>=0 and cx<4 and cy>=0 and cy<4 then
   self.value=cy*4+cx
-  if (self.func) self.func(self)
+  if self.func then
+   self.func(self)
+  end
  end
 end
 

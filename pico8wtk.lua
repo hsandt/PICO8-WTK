@@ -324,9 +324,9 @@ end
 
 function label:draw(x, y)
  if(type(self.text)=="string") then
-  print(self.text, x, y, self.c)
+  api.print(self.text, x, y, self.c)
  else
-  print(""..self.text(self), x, y, self.c)
+  api.print(""..self.text(self), x, y, self.c)
  end
 end
 
@@ -442,7 +442,7 @@ end
 
 function spinner:draw(x, y)
  rectfill(x, y, x+self.w-1, y+self.h-1, 7)
- print(self.value, x+2, y+2, 0)
+ api.print(self.value, x+2, y+2, 0)
 end
 
 function spinner:adjust(amt)
@@ -472,7 +472,7 @@ function spinbtn:draw(x, y)
  else
   draw_convex_frame(x, y, x+self.w-1, y+self.h-1, 6)
  end
- print(self.text, x+2, y+2, 1)
+ api.print(self.text, x+2, y+2, 1)
 end
 
 function spinbtn:update()

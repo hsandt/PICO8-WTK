@@ -2,6 +2,7 @@ local wtk = {}
 local widget
 local gui_root
 local panel
+local vertical_layout
 local label
 local icon
 local button
@@ -296,6 +297,62 @@ function panel:on_mouse_move(dx, dy)
   self.x=self.x+dx
   self.y=self.y+dy
  end
+end
+
+-- vertical_layout
+
+vertical_layout={}
+subwidget(vertical_layout)
+
+function vertical_layout.new(w, c, padding)
+ local vl=widget.new()
+ setmetatable(vl, vertical_layout)
+ vl.w=w or 5
+ vl.h=0
+ vl.c=c or 6
+ vl.padding=padding or 1
+ return vl
+end
+
+function vertical_layout:add_child(c)
+ -- unlike other add_child methods, this one doesn't take (x, y)
+ --  because force vertical arrangement
+
+ -- add next child below last one
+ local y
+ if #self.children == 0 then
+  y=0
+ else
+  local last_child = self.children[#self.children]
+  y=last_child.y+last_child.h+self.padding
+ end
+
+ self.w=max(self.w, c.w)
+ self.h=self.h+c.h+self.padding
+ widget.add_child(self, c, 0, y)
+end
+
+function vertical_layout:draw(x, y)
+ rectfill(x, y, x+self.w-1, y+self.h-1, self.c)
+end
+
+function vertical_layout:remove_child(c)
+ -- move all children below c up one row
+ local after_c=false
+ for v in all(self.children) do
+  if after_c then
+   -- subtract the height of the removed child + the vertical padding
+   v.y=v.y-c.h-self.padding
+  elseif v == c then
+    after_c=true
+  end
+ end
+
+ -- reduce height (keep width)
+ self.h=self.h-c.h-self.padding
+
+ -- even if index is nil, we call the base method to preserve widget behavior
+ widget.remove_child(self, c)
 end
 
 -- label
@@ -657,8 +714,10 @@ function color_picker:on_mouse_press()
 end
 
 -- export
+wtk.widget = widget
 wtk.gui_root = gui_root
 wtk.panel = panel
+wtk.vertical_layout = vertical_layout
 wtk.label = label
 wtk.icon = icon
 wtk.button = button

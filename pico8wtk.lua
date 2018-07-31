@@ -325,10 +325,11 @@ function vertical_layout:add_child(c)
  else
   local last_child = self.children[#self.children]
   y=last_child.y+last_child.h+self.padding
+  self.h=self.h+self.padding
  end
 
  self.w=max(self.w, c.w)
- self.h=self.h+c.h+self.padding
+ self.h=self.h+c.h
  widget.add_child(self, c, 0, y)
 end
 
@@ -363,7 +364,6 @@ subwidget(label)
 function label.new(text, c, func)
  local l=widget.new()
  setmetatable(l, label)
- l.h=5
  l.c=c or 0
  if func then
   l.wants_mouse=true
@@ -371,12 +371,41 @@ function label.new(text, c, func)
  end
  if type(text)=="function" then
   l.text=text
-  l.w=max(#(""..text(self))*4-1, 0)
+  l.w,l.h=label.compute_size(""..text(l))
  else
   l.text=""..text
-  l.w=max(#l.text*4-1, 0)
+  l.w,l.h=label.compute_size(text)
  end
  return l
+end
+
+function label.compute_size(text)
+ -- label height is based on number of lines
+ local nb_lines=1
+
+ -- label width is based on longest line
+ local nb_chars=0
+ local max_nb_chars=0
+
+ for i=1, #text do
+  if sub(text, i, i) == "\n" then
+   nb_lines=nb_lines+1
+   max_nb_chars=max(max_nb_chars, nb_chars)
+   nb_chars=0
+  else
+   nb_chars=nb_chars+1
+  end
+ end
+
+ -- need to check if the last line was the longest
+ max_nb_chars=max(max_nb_chars, nb_chars)
+
+ -- character width = 4, margin between chars = 1
+ local w = max(max_nb_chars*4-1, 0)
+ -- line height = 5, margin between lines = 1
+ local h = nb_lines*6-1
+
+ return w, h
 end
 
 function label:draw(x, y)
